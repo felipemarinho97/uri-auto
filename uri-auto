@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#     URI Automatizado 2, a fork of TST Autoamtizado
+#     URI Automatizado, a fork of TST Autoamtizado
 #     Copyright (C) 2016  Felipe Marinho
 
 #     This program is free software: you can redistribute it and/or modify
@@ -31,18 +31,18 @@ def processar_arquivo(file):
 	return json.loads(data.decode())
 
 def grava_alteracoes(data):
-	file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
+	file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
 	file.write(json.dumps(data))
 
 def instalar_dropbox():
 	print "Descarregando o cliente dropbox-cli..."
-	os.system("wget -O %s/.tst/bin/dropbox 'https://www.dropbox.com/download?dl=packages/dropbox.py'" % os.environ["HOME"])
-	os.system("chmod +x %s/.tst/bin/dropbox" % os.environ["HOME"])
+	os.system("wget -O %s/.uri-auto/bin/dropbox 'https://www.dropbox.com/download?dl=packages/dropbox.py'" % os.environ["HOME"])
+	os.system("chmod +x %s/.uri-auto/bin/dropbox" % os.environ["HOME"])
 	try:
 		os.system("dropbox start -i")
 		subprocess.Popen(["dropbox", "start"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	except OSError:
-		os.system("rm %s/.tst/bin/dropbox" % os.environ["HOME"])
+		os.system("rm %s/.uri-auto/bin/dropbox" % os.environ["HOME"])
 		print "Arquivo corrompido."
 
 def dropbox():
@@ -51,7 +51,7 @@ def dropbox():
 		if os.system("type dropbox > /dev/null") == 0:
 			return data["dbox"]
 		else:
-			key = raw_input("Deseja que o TST Auto sicronize automaticamente seus exercícios no Dropbox? (Y/n/(N)unca) ")
+			key = raw_input("Deseja que o Uri-Auto sicronize automaticamente seus exercícios no Dropbox? (Y/n/(N)unca) ")
 			if key == "Y" or key == "y":
 				instalar_dropbox()
 				print raw_input("Por favor faça login em seu Dropbox e após isso aperte qualquer tecla.")
@@ -67,19 +67,19 @@ def dropbox():
 
 def configurar():
 	try: # Procura por arquivo de configuração. Se configuração não existir, cria uma nova.
-		with open('%s/tst_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
+		with open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
 	except IOError:
-		print "\033[1m" + "-------\nBem Vindo ao TST Automatizado.\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n-------" + "\033[0;0m"
-		print "tst_auto.json não encontrado, criando nova configuração.\n"
-		file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
+		print "\033[1m" + "-------\nBem Vindo ao Uri-Auto, fork do TST-Auto.\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n-------" + "\033[0;0m"
+		print "uri_auto.json não encontrado, criando nova configuração.\n"
+		file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
 		nome = raw_input("Digite seu nome para o cabeçalho: ")
 		matricula = raw_input("Digite os nº da sua matrícula: ")
 		email = raw_input("Digite os seu email institucional: ")
 		data = json.dumps({"nome": "%s" % nome,"matricula": "%s" % matricula, "email": "%s" % email, "lastfile": None,"lastdir": None, "language": "py", "dbox": None})
 		file.write(data)
 		file.close()
-		print "\nEsta tela não será mais apresentada novamente.\nCaso queira mudar as configurações edite o tst_auto.json ou apague-o.\n"
-		with open('%s/tst_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
+		print "\nEsta tela não será mais apresentada novamente.\nCaso queira mudar as configurações edite o uri_auto.json ou apague-o.\n"
+		with open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
 		#dbox = dropbox()
 	return data
 
@@ -131,7 +131,7 @@ def main():
 	## Gravação do último arquivo
 	data["lastfile"] = arquivo
 	data["lastdir"] = diretorio
-	file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
+	file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
 	file.write(json.dumps(data))
 	
 	## Formatação do cabeçalho
@@ -183,7 +183,7 @@ for i in range(1,len(sys.argv)):
 	elif sys.argv[i] == "--set-language" or sys.argv[i] == "-l":
 		data = configurar()
 		data["language"] = str(sys.argv[i+1]).lower()
-		file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
+		file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
 		file.write(json.dumps(data))
 		sys.exit()
 		#main()
@@ -197,7 +197,7 @@ for i in range(1,len(sys.argv)):
 			grava_alteracoes(data)
 		sys.exit()
 	elif sys.argv[i] == "--version" or sys.argv[i] == "-v":
-		print """Uri-auto 0.2\n\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n"""
+		print """Uri-auto 0.22\n\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n"""
 	else:
 		print 'Argumento inválido, tente "-h" ou "--help".'
 
