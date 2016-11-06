@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-#     TST Automatizado
+#     URI Automatizado 2, a fork of TST Autoamtizado
 #     Copyright (C) 2016  Felipe Marinho
 
 #     This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@ def grava_alteracoes(data):
 	file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
 	file.write(json.dumps(data))
 
-def install_dropbox():
+def instalar_dropbox():
 	print "Descarregando o cliente dropbox-cli..."
 	os.system("wget -O %s/.tst/bin/dropbox 'https://www.dropbox.com/download?dl=packages/dropbox.py'" % os.environ["HOME"])
 	os.system("chmod +x %s/.tst/bin/dropbox" % os.environ["HOME"])
@@ -44,25 +44,24 @@ def install_dropbox():
 	except OSError:
 		os.system("rm %s/.tst/bin/dropbox" % os.environ["HOME"])
 		print "Arquivo corrompido."
-	print raw_input("Por favor faça login em seu Dropbox e após isso aperte qualquer tecla.")
 
 def dropbox():
 	data = configurar()
 	if data["dbox"] != "":
-		if os.system("type dropbox > /dev/null") == 0: # Se Dropbox estiver instalado, usar config padrão.
+		if os.system("type dropbox > /dev/null") == 0:
 			return data["dbox"]
 		else:
 			key = raw_input("Deseja que o TST Auto sicronize automaticamente seus exercícios no Dropbox? (Y/n/(N)unca) ")
 			if key == "Y" or key == "y":
-				install_dropbox()		# Instala o Dropbox na máquina e ativa
-				data["dbox"] = 'Dropbox'	# a sincronização como padrão.
+				instalar_dropbox()
+				print raw_input("Por favor faça login em seu Dropbox e após isso aperte qualquer tecla.")
+				data["dbox"] = 'Dropbox'
 				grava_alteracoes(data)
-				# A ser implementado.
 			elif key == "N":
-				data["dbox"] = '' # A função não entra no if, portanto fica definido como "Nunca" usar o Dropbox.
+				data["dbox"] = ''
 				grava_alteracoes(data)
 			else:
-				dbox = '' # Não usa a sincronização apenas desta vez.
+				dbox = ''
 				return dbox
 	return data["dbox"]
 
@@ -72,52 +71,82 @@ def configurar():
 	except IOError:
 		print "\033[1m" + "-------\nBem Vindo ao TST Automatizado.\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n-------" + "\033[0;0m"
 		print "tst_auto.json não encontrado, criando nova configuração.\n"
+		file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
 		nome = raw_input("Digite seu nome para o cabeçalho: ")
 		matricula = raw_input("Digite os nº da sua matrícula: ")
 		email = raw_input("Digite os seu email institucional: ")
-		data = {"nome": "%s" % nome,"matricula": "%s" % matricula, "email": "%s" % email, "lastfile": None,"lastdir": None, "dbox": None}
-		grava_alteracoes(data)
+		data = json.dumps({"nome": "%s" % nome,"matricula": "%s" % matricula, "email": "%s" % email, "lastfile": None,"lastdir": None, "language": "py", "dbox": None})
+		file.write(data)
 		file.close()
 		print "\nEsta tela não será mais apresentada novamente.\nCaso queira mudar as configurações edite o tst_auto.json ou apague-o.\n"
 		with open('%s/tst_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
+		#dbox = dropbox()
 	return data
 
 def help():
-	print 'Uso: tst_auto.py [.] [..] [./] [-h]'
-	print ' -h, --help\tExibe esta ajuda.\n'
-	print ' ./\t\tExecuta a saída do último arquivo trabalhado.'
-	print ' .\t\tExecuta os testes locais no último diretório trabalhado.'
-	print ' ..\t\tExecuta o "commit" no último diretório trabalhado.'
+	print 'Uso: uri-auto [.] [..] [./] [-l] [--sync] [-h]\n'
+	print ' -h, --help\t\tExibe esta ajuda.'
+	print ' --sync [on] [off]\tAtiva ou desativa a sincronização automática com o Dropbox.'
+	print ' -l, --set-language [*]\tDefine uma lingugem padrão para todos os arquivos.\n\t\t\t[Python], [Java], [C], [C++]\n'
+	print ' ./\t\t\tExecuta a saída do último arquivo trabalhado.'
+	print ' .\t\t\tExecuta os testes locais ou compila o arquivo no último diretório trabalhado.'
+	print ' ..\t\t\tExecuta o "commit" no último diretório trabalhado. (TST Online)'
 
 def main():
 	### Configurações Gerais
 	data = configurar()
-	dbox = dropbox().encode("utf8")
+	dbox = dropbox()
 
 	## Editor de Texto padrão: Sublime Text 2
-	# Exemplos de opções: "subl"; "subl3"; "gedit"; "geany"; "vim"; "nano"
-	editor = "gedit"
+	# Exemplos de opções: "subl"; "gedit"; "geany"; "vim"; "nano"
+	editor = "subl3"
 
 	### Entrada
+	linguagem = raw_input("Digite a Linguagem: ")
 	exercicio = raw_input("Digite o nome do exercício: ")
 	unidade = raw_input("Unidade: ")
-	checkout = raw_input("Cole aqui o checkout: ")
+	if linguagem.lower() == "py" or linguagem.lower() == "python":
+		checkout = raw_input("Cole aqui o checkout: ")
+	elif linguagem.lower() == "" and data["language"] == "py":
+		checkout = raw_input("Cole aqui o checkout: ")
+	if linguagem == "":
+		linguagem = data["language"]
 
 	### Processamento
-	diretorio = "%s/%s/Exercícios/%s/%s" % (os.environ["HOME"],dbox,unidade,exercicio)
-	arquivo = "%s.py" % (str.lower(remover_acentos(exercicio))).replace(" ","-")
+	diretorio = "%s/%s/Exercícios/%s/%s/%s" % (os.environ["HOME"],dbox.encode("utf8"),linguagem.encode("utf8"),unidade,exercicio)
+	if linguagem.lower() == "c++" or data["language"] == "c++":
+		sufix = "cpp"
+		lib = "<iostream>"
+	elif linguagem.lower() == "c" or data["language"] == "c":
+		sufix = "c"
+		lib = "<stdio.h>"
+	elif linguagem.lower() == "java" or data["language"] == "java":
+		sufix = "java"
+	elif linguagem.lower() == "python" or linguagem.lower() == "py" or data["language"] == "py":
+		sufix = "py"
+	else:
+		sufix = linguagem.lower()
+	arquivo = "%s.%s" % ((str.lower(remover_acentos(exercicio))).replace(" ","-"),sufix)
+
 	## Gravação do último arquivo
 	data["lastfile"] = arquivo
 	data["lastdir"] = diretorio
 	file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
 	file.write(json.dumps(data))
+	
 	## Formatação do cabeçalho
-	cabecalho = "# coding: utf-8\n# %s\n# %s (C) | %s | <%s>" % (exercicio, data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"))
+	if sufix == "cpp" or sufix == "c":
+		cabecalho = "// %s | %s (C) | <%s>\n#include %s\n" % (exercicio, data["nome"].encode("utf8"), data["email"].encode("utf8"),lib)
+	elif sufix == "py":
+		cabecalho = "# coding: utf-8\n# %s\n# %s (C) | %s | <%s>" % (exercicio, data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"))
+	else:
+		cabecalho = ""	
 
 	### Saída
 	os.makedirs(diretorio)
 	os.chdir(diretorio)
-	os.system("tst checkout %s" % checkout)
+	if sufix == "py":
+		os.system("tst checkout %s" % checkout)
 	open(arquivo,"w").write(cabecalho)
 	print arquivo + " criado com sucesso."
 	os.system('%s "%s" 2>&1&> /dev/null' % (editor,arquivo))
@@ -127,7 +156,15 @@ for i in range(1,len(sys.argv)):
 	if sys.argv[i] == ".":
 		data = configurar()
 		os.chdir(data["lastdir"])
-		os.system("tst test %s" % data["lastfile"])
+		if data["lastfile"][-3:] == "cpp":
+			compiler = "c++"
+		elif data["lastfile"][-1:] == "c":
+			compiler = "gcc"
+		elif data["lastfile"][-4:] == "java":
+			compiler = "javac"
+		else:
+			compiler = "tst test"
+		os.system("%s %s" % (compiler,data["lastfile"]))
 	elif sys.argv[i] == "..":
 		data = configurar()
 		os.chdir(data["lastdir"])
@@ -135,9 +172,32 @@ for i in range(1,len(sys.argv)):
 	elif sys.argv[i] == "./":
 		data = configurar()
 		os.chdir(data["lastdir"])
-		os.system("python %s" % data["lastfile"])
+		if data["lastfile"][-1:] == "c" or data["lastfile"][-3:] == "cpp":
+			os.system("./a.out")
+		elif data["lastfile"][-4:] == "java":
+			os.system("java %s" % data["lastfile"][:-5])
+		else:
+			os.system("python %s" % data["lastfile"])
 	elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
 		help()
+	elif sys.argv[i] == "--set-language" or sys.argv[i] == "-l":
+		data = configurar()
+		data["language"] = str(sys.argv[i+1]).lower()
+		file = open('%s/tst_auto.json' % os.environ["HOME"],'w')
+		file.write(json.dumps(data))
+		sys.exit()
+		#main()
+	elif sys.argv[i] == "--sync":
+		data = configurar()
+		if sys.argv[i+1] == "on":
+			data["dbox"] = "Dropbox"
+			grava_alteracoes(data)
+		elif sys.argv[i+1] == "off":
+			data["dbox"] = ""
+			grava_alteracoes(data)
+		sys.exit()
+	elif sys.argv[i] == "--version" or sys.argv[i] == "-v":
+		print """Uri-auto 0.2\n\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n"""
 	else:
 		print 'Argumento inválido, tente "-h" ou "--help".'
 
