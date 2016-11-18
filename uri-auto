@@ -103,7 +103,7 @@ def main():
 	editor = "subl"
 
 	### Entrada
-	linguagem = raw_input("Digite a Linguagem: ")
+	linguagem = str.capitalize(raw_input("Digite a Linguagem: "))
 	exercicio = raw_input("Digite o nome do exercício: ")
 	unidade = raw_input("Unidade: ")
 	if linguagem.lower() == "py" or linguagem.lower() == "python":
@@ -111,19 +111,19 @@ def main():
 	elif linguagem.lower() == "" and data["language"] == "py":
 		checkout = raw_input("Cole aqui o checkout: ")
 	if linguagem == "":
-		linguagem = data["language"]
+		linguagem = str.capitalize(data["language"].encode("utf8"))
 
 	### Processamento
 	diretorio = "%s/%s/Exercícios/%s/%s/%s" % (os.environ["HOME"],dbox.encode("utf8"),linguagem.encode("utf8"),unidade,exercicio)
-	if linguagem.lower() == "c++" or data["language"] == "c++":
+	if linguagem.lower() == "c++" or (linguagem.lower() == "" and data["language"] == "c++"):
 		sufix = "cpp"
 		lib = "<iostream>"
-	elif linguagem.lower() == "c" or data["language"] == "c":
+	elif linguagem.lower() == "c" or (linguagem.lower() == "" and data["language"] == "c"):
 		sufix = "c"
 		lib = "<stdio.h>"
-	elif linguagem.lower() == "java" or data["language"] == "java":
+	elif linguagem.lower() == "java" or (linguagem.lower() == "" and data["language"] == "java"):
 		sufix = "java"
-	elif linguagem.lower() == "python" or linguagem.lower() == "py" or data["language"] == "py":
+	elif linguagem.lower() == "python" or linguagem.lower() == "py" or (linguagem.lower() == "" and data["language"] == "py"):
 		sufix = "py"
 	else:
 		sufix = linguagem.lower()
@@ -192,7 +192,6 @@ for i in range(1,len(sys.argv)):
 		data["language"] = str(sys.argv[i+1]).lower()
 		grava_alteracoes(data)
 		sys.exit()
-		#main()
 	elif sys.argv[i] == "--sync":
 		data = configurar()
 		if sys.argv[i+1] == "on":
@@ -204,6 +203,9 @@ for i in range(1,len(sys.argv)):
 		sys.exit()
 	elif sys.argv[i] == "--version" or sys.argv[i] == "-v":
 		print """Uri-auto 0.22\n\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n"""
+	elif sys.argv[i] == "-rm":
+		data = configurar()
+		os.system("rm -r '%s'" % data["lastdir"].encode("utf8"))
 	else:
 		print 'Argumento inválido, tente "-h" ou "--help".'
 
