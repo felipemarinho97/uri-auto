@@ -71,13 +71,11 @@ def configurar():
 	except IOError:
 		print "\033[1m" + "-------\nBem Vindo ao Uri-Auto, fork do TST-Auto.\nEscrito por Felipe Marinho (C) sob os termos da licença GPLv3.\n-------" + "\033[0;0m"
 		print "uri_auto.json não encontrado, criando nova configuração.\n"
-		file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
 		nome = raw_input("Digite seu nome para o cabeçalho: ")
 		matricula = raw_input("Digite os nº da sua matrícula: ")
 		email = raw_input("Digite os seu email institucional: ")
-		data = json.dumps({"nome": "%s" % nome,"matricula": "%s" % matricula, "email": "%s" % email, "lastfile": None,"lastdir": None, "language": "py", "dbox": None})
-		file.write(data)
-		file.close()
+		data = {"nome": "%s" % nome,"matricula": "%s" % matricula, "email": "%s" % email, "lastfile": None,"lastdir": None, "language": "py", "dbox": None}
+		grava_alteracoes(data)
 		print "\nEsta tela não será mais apresentada novamente.\nCaso queira mudar as configurações edite o uri_auto.json ou apague-o.\n"
 		with open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
 		#dbox = dropbox()
@@ -94,12 +92,15 @@ def help():
 
 def main():
 	### Configurações Gerais
-	data = configurar()
+	try:
+		data = configurar()
+	except:
+		os.system('rm %s/.uri-auto/uri_auto.json' % os.environ["HOME"])
 	dbox = dropbox()
 
 	## Editor de Texto padrão: Sublime Text 2
 	# Exemplos de opções: "subl"; "gedit"; "geany"; "vim"; "nano"
-	editor = "subl3"
+	editor = "subl"
 
 	### Entrada
 	linguagem = raw_input("Digite a Linguagem: ")
@@ -126,19 +127,24 @@ def main():
 		sufix = "py"
 	else:
 		sufix = linguagem.lower()
-	arquivo = "%s.%s" % ((str.lower(remover_acentos(exercicio))).replace(" ","-"),sufix)
 
-	## Gravação do último arquivo
+	if sufix == "java":
+		arquivo = "%s.%s" % ((remover_acentos(exercicio)).replace(" ",""),sufix)
+	else:
+		arquivo = "%s.%s" % ((str.lower(remover_acentos(exercicio))).replace(" ","-"),sufix)
+
+	## Gravação do último arquivo no uri-auto.json
 	data["lastfile"] = arquivo
 	data["lastdir"] = diretorio
-	file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
-	file.write(json.dumps(data))
+	grava_alteracoes(data)
 	
 	## Formatação do cabeçalho
 	if sufix == "cpp" or sufix == "c":
 		cabecalho = "// %s | %s (C) | <%s>\n#include %s\n" % (exercicio, data["nome"].encode("utf8"), data["email"].encode("utf8"),lib)
 	elif sufix == "py":
 		cabecalho = "# coding: utf-8\n# %s\n# %s (C) | %s | <%s>" % (exercicio, data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"))
+	elif sufix == "java":
+		cabecalho = "/*Aluno: %s, %s*/\n\npublic class %s {\n\t\n}" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), (remover_acentos(exercicio)).replace(" ",""))
 	else:
 		cabecalho = ""	
 
@@ -149,7 +155,8 @@ def main():
 		os.system("tst checkout %s" % checkout)
 	open(arquivo,"w").write(cabecalho)
 	print arquivo + " criado com sucesso."
-	os.system('%s "%s" 2>&1&> /dev/null' % (editor,arquivo))
+	# os.system('%s "%s" 2>&1&> /dev/null' % (editor,arquivo))
+	subprocess.Popen([editor,arquivo], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	sys.exit()
 
 for i in range(1,len(sys.argv)):
@@ -183,8 +190,7 @@ for i in range(1,len(sys.argv)):
 	elif sys.argv[i] == "--set-language" or sys.argv[i] == "-l":
 		data = configurar()
 		data["language"] = str(sys.argv[i+1]).lower()
-		file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
-		file.write(json.dumps(data))
+		grava_alteracoes(data)
 		sys.exit()
 		#main()
 	elif sys.argv[i] == "--sync":
