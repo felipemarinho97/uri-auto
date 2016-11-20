@@ -1,0 +1,8 @@
+{
+	"name": "c",
+	"sufix": "c",
+	"compiler": "gcc %s.c -o %s -lm",
+	"cabecalho": "// %s (C) %s | <%s>\n// %s\n#include <stdio.h>\n",
+	"exec": "./%s",
+	"case-sensitive": false
+}
