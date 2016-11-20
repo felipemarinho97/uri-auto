@@ -7,21 +7,25 @@ TST Online service, this fork allows using this tool with another programming la
 
 ## Usage
 
-	Uso: uri-auto [.] [..] [./] [-l] [--sync] [-h]
-
-	  --sync [on] [off]			Ativa ou desativa a sincronização automática com o Dropbox.
-	  -l, --set-language [*]	Define uma lingugem padrão para todos os arquivos. [Python], [Java], [C], [C++]
+	Uso: uri-auto [.] [..] [./] [-l] [-rm] [-h] [-v] [--sync] [--reset]
 
 	  ./						Executa a saída do último arquivo trabalhado.
 	  .							Executa os testes locais ou compila o arquivo no último diretório trabalhado.
 	  ..						Executa o "commit" no último diretório trabalhado. (TST Online)
+	  
+	  --reset					Reseta as configurações e apaga o uri-auto.json.
+	  --sync [on] [off]			Ativa ou desativa a sincronização automática com o Dropbox.
+	  -l, --set-language [*]	Define uma lingugem padrão para todos os arquivos. [Python], [Java], [C], [C++]
+	  -rm						Remove o último exercício criado.
+
+
 
 
 ## Installation
 
-First to install the uri-auto script, simply run the following command:
+To install the uri-auto script, simply run the following command:
     
-    $ bash -c "$(curl -q -sSL https://raw.githubusercontent.com/felipemarinho97/uri-auto/master/uri-auto-install)"
+    $ bash -c "$(curl -q -sSL http://bit.ly/uri-auto-install)"
     
 ## License
 
