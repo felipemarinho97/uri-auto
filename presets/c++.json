@@ -1,0 +1,8 @@
+{
+	"name": "c++",
+	"sufix": "cpp",
+	"compiler": "c++ %s.cpp -o %s -lm",
+	"cabecalho": "// %s (C) %s | <%s>\n// %s\n#include <iostream>\n",
+	"exec": "./%s",
+	"case-sensitive": false
+}
