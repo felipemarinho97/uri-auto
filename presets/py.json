@@ -1,0 +1,8 @@
+{
+	"name": "py",
+	"sufix": "py",
+	"compiler": "",
+	"cabecalho": "# coding: utf-8\n# %s (C) | %s | <%s>\n# %s\n",
+	"exec": "python %s.py",
+	"case-sensitive": false
+}
