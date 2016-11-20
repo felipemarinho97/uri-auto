@@ -106,7 +106,7 @@ def configurar():
 	return data
 
 def help():
-	print 'Uso: uri-auto [.] [..] [./] [-l] [--sync] [-h]\n'
+	print 'Uso: uri-auto [.] [..] [./] [-l] [-rm] [-h] [-v] [--sync] [--reset]\n'
 	print ' ./\t\t\tExecuta a saída do último arquivo trabalhado.'
 	print ' .\t\t\tExecuta os testes locais ou compila o arquivo no último diretório trabalhado.'
 	print ' ..\t\t\tExecuta o "commit" no último diretório trabalhado. (TST Online)\n'
