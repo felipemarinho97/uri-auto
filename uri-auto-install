@@ -4,10 +4,6 @@ echo "Baixando uri-auto."
 git clone https://github.com/felipemarinho97/uri-auto.git .uri-auto
 cd ~/.uri-auto
 rm -r -f .git
-# mkdir -p ~/.uri-auto/bin
 echo "Atualizando vatiável de ambiente."
 echo 'export PATH=$PATH:~/.uri-auto/bin' >> ~/.bashrc
 echo "[uri-auto] instalado com sucesso.. digite "uri-auto --help" no seu terminal para uso do comando"
-
-# wget -O $HOME/.uri-auto/bin/uri-auto https://raw.githubusercontent.com/felipemarinho97/uri-auto/master/uri-auto
-# chmod +x $HOME/.uri-auto/bin/uri-auto
