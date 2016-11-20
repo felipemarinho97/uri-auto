@@ -29,12 +29,23 @@ def remover_acentos(txt, codif='utf-8'):
 	return normalize('NFKD', txt.decode(codif)).encode('ASCII','ignore')
 
 def processar_arquivo(file):
-	data = file.readline()
+	data = file.read()
 	return json.loads(data.decode())
 
 def grava_alteracoes(data):
 	file = open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"],'w')
-	file.write(json.dumps(data))
+	file.write(json.dumps(data, sort_keys=False, indent=4, separators=(',', ': ')))
+
+def load_template(language):
+	try:
+		file = open('%s/.uri-auto/presets/%s.json' % (os.environ["HOME"],language.lower()),'r')
+		template = json.loads(file.read().decode())
+		return template
+	except IOError:
+		file = open('%s/.uri-auto/presets/default.json' % os.environ["HOME"],'r')
+		template = json.loads(file.read().decode())
+		return template 
+
 
 def instalar_dropbox():
 	print "Descarregando o cliente dropbox-cli..."
@@ -153,9 +164,9 @@ def main():
 	
 	## Formatação do cabeçalho
 	if sufix == "cpp" or sufix == "c":
-		cabecalho = "// %s | %s (C) | <%s>\n#include %s\n" % (exercicio, data["nome"].encode("utf8"), data["email"].encode("utf8"),lib)
+		cabecalho = "// %s (C) %s | <%s>\n// %s\n#include %s\n" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio, lib)
 	elif sufix == "py":
-		cabecalho = "# coding: utf-8\n# %s\n# %s (C) | %s | <%s>" % (exercicio, data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"))
+		cabecalho = "# coding: utf-8\n# %s (C) | %s | <%s>\n# %s\n" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio)
 	elif sufix == "java":
 		cabecalho = "/*Aluno: %s, %s*/\n\npublic class %s {\n\t\n}" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), (remover_acentos(exercicio)).replace(" ",""))
 	else:
