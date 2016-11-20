@@ -1,6 +1,8 @@
 {
+	"name": "java",
 	"sufix": "java",
-	"compiler": "javac",
-	"cabecalho": "/*Aluno: %s, %s*/\n\npublic class %s {\n\t\n}",
+	"compiler": "javac %s.java",
+	"cabecalho": "/*Aluno: %s, %s, %s*/\n\npublic class %s {\n\t\n}",
+	"exec": "java %s",
 	"case-sensitive": true
 }
