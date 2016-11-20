@@ -1,0 +1,6 @@
+{
+	"sufix": "java",
+	"compiler": "javac",
+	"cabecalho": "/*Aluno: %s, %s*/\n\npublic class %s {\n\t\n}",
+	"case-sensitive": true
+}
