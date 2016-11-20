@@ -23,7 +23,7 @@ import os
 import json
 import sys
 
-VERSION = "0.39"
+VERSION = "0.4"
 
 def remover_acentos(txt, codif='utf-8'):
 	return normalize('NFKD', txt.decode(codif)).encode('ASCII','ignore')
@@ -103,7 +103,6 @@ def configurar():
 		grava_alteracoes(data)
 		print "\nEsta tela não será mais apresentada novamente.\nCaso queira mudar as configurações edite o uri_auto.json ou apague-o.\n"
 		with open('%s/.uri-auto/uri_auto.json' % os.environ["HOME"], 'r') as file: data = processar_arquivo(file)
-		#dbox = dropbox()
 	return data
 
 def help():
@@ -150,19 +149,10 @@ def main():
 	### Processamento
 	template = load_template(linguagem)
 	diretorio = "%s/%s/Exercícios/%s/%s/%s" % (os.environ["HOME"],dbox.encode("utf8"),linguagem.encode("utf8"),unidade,exercicio)
-	# if linguagem.lower() == "c++" or (linguagem.lower() == "" and data["language"] == "c++"):
-	# 	sufix = "cpp"
-	# 	lib = "<iostream>"
-	# elif linguagem.lower() == "c" or (linguagem.lower() == "" and data["language"] == "c"):
-	# 	sufix = "c"
-	# 	lib = "<stdio.h>"
-	# elif linguagem.lower() == "java" or (linguagem.lower() == "" and data["language"] == "java"):
-	# 	sufix = "java"
-	# elif linguagem.lower() == "python" or linguagem.lower() == "py" or (linguagem.lower() == "" and data["language"] == "py"):
-	# 	sufix = "py"
-	# else:
-	# 	sufix = linguagem.lower()
-	
+
+	## Formatação do cabeçalho
+	if template["name"] == "default":
+		template["sufix"] = linguagem.lower()
 
 	if template["case-sensitive"]:
 		arquivo = "%s.%s" % (str.title(remover_acentos(exercicio)).replace(" ",""),template["sufix"])
@@ -172,7 +162,6 @@ def main():
 
 	if template["name"] == "default":
 		cabecalho = ""
-		template["sufix"] = linguagem.lower()
 	else:
 		cabecalho = template["cabecalho"] % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio)
 
@@ -182,16 +171,6 @@ def main():
 	data["lastlang"] = linguagem.lower()
 	grava_alteracoes(data)
 	
-	## Formatação do cabeçalho
-	# if template["sufix"] == "cpp" or template["sufix"] == "c":
-	# 	cabecalho = "// %s (C) %s | <%s>\n// %s\n#include %s\n" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio, lib)
-	# elif template["sufix"] == "py":
-	# 	cabecalho = "# coding: utf-8\n# %s (C) | %s | <%s>\n# %s\n" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio)
-	# elif template["sufix"] == "java":
-	# 	cabecalho = "/*Aluno: %s, %s*/\n\npublic class %s {\n\t\n}" % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), exercicio)
-	# else:
-	# 	cabecalho = ""	
-
 
 	### Saída
 	os.makedirs(diretorio)
@@ -200,7 +179,6 @@ def main():
 		os.system("tst checkout %s" % checkout)
 	open(arquivo,"w").write(cabecalho)
 	print arquivo + " criado com sucesso."
-	# os.system('%s "%s" 2>&1&> /dev/null' % (editor,arquivo))
 	subprocess.Popen([editor,arquivo], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	sys.exit()
 
@@ -209,17 +187,9 @@ for i in range(1,len(sys.argv)):
 		data = configurar()
 		template = load_template(data["lastlang"])
 		os.chdir(data["lastdir"])
-		# if data["lastfile"][-3:] == "cpp":
-		# 	compiler = "c++"
-		# elif data["lastfile"][-1:] == "c":
-		# 	compiler = "gcc"
-		# elif data["lastfile"][-4:] == "java":
-		# 	compiler = "javac"
-		# else:
-		# 	compiler = "tst test"
 		filename = data["lastfile"].split(".")
 		if template["compiler"] == "":
-			print 'Nenhuma ação definida para %s, usando o template "%s".' % (data["lastlang"].encode("utf8"),template["name"].encode("utf8"))
+			print 'Nenhuma ação definida para compilar em %s, usando o template "%s".' % (data["lastlang"].encode("utf8"),template["name"].encode("utf8"))
 			sys.exit()
 		elif conta_argumentos(template["compiler"]) == 2:
 			os.system(template["compiler"] % (filename[0],filename[0]))	
@@ -239,12 +209,6 @@ for i in range(1,len(sys.argv)):
 			sys.exit()
 		else:
 			os.system(template["exec"] % filename[0])
-		# if data["lastfile"][-1:] == "c" or data["lastfile"][-3:] == "cpp":
-		# 	os.system("./a.out")
-		# elif data["lastfile"][-4:] == "java":
-		# 	os.system("java %s" % data["lastfile"][:-5])
-		# else:
-		# 	os.system("python %s" % data["lastfile"])
 	elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
 		help()
 	elif sys.argv[i] == "--set-language" or sys.argv[i] == "-l":
