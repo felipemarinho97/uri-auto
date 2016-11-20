@@ -1,8 +1,7 @@
 #!/bin/bash
 
 echo "Baixando uri-auto."
-cd ~/
-git clone https://github.com/felipemarinho97/uri-auto.git .uri-auto
+git clone https://github.com/felipemarinho97/uri-auto.git ~/.uri-auto
 cd ~/.uri-auto
 rm -r -f .git
 echo "Atualizando variável de ambiente."
