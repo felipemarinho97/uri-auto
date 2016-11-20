@@ -23,7 +23,7 @@ import os
 import json
 import sys
 
-VERSION = "0.29"
+VERSION = "0.38"
 
 def remover_acentos(txt, codif='utf-8'):
 	return normalize('NFKD', txt.decode(codif)).encode('ASCII','ignore')
@@ -108,12 +108,15 @@ def configurar():
 
 def help():
 	print 'Uso: uri-auto [.] [..] [./] [-l] [--sync] [-h]\n'
-	print ' -h, --help\t\tExibe esta ajuda.'
-	print ' --sync [on] [off]\tAtiva ou desativa a sincronização automática com o Dropbox.'
-	print ' -l, --set-language [*]\tDefine uma lingugem padrão para todos os arquivos.\n\t\t\t[Python], [Java], [C], [C++]\n'
 	print ' ./\t\t\tExecuta a saída do último arquivo trabalhado.'
 	print ' .\t\t\tExecuta os testes locais ou compila o arquivo no último diretório trabalhado.'
-	print ' ..\t\t\tExecuta o "commit" no último diretório trabalhado. (TST Online)'
+	print ' ..\t\t\tExecuta o "commit" no último diretório trabalhado. (TST Online)\n'
+	print ' --reset\t\tReseta as configurações e apaga o uri-auto.json'
+	print ' --sync [on] [off]\tAtiva ou desativa a sincronização automática com o Dropbox.'
+	print ' -l, --set-language [*]\tDefine uma lingugem padrão para todos os arquivos.\n\t\t\t[Python], [Java], [C], [C++]'
+	print ' -rm\t\t\tRemove o último exercício criado'
+	print '\n -h, --help\t\tExibe esta ajuda.'
+	print ' -v, --version\t\tExibe a versão atual.'
 
 def main():
 	### Configurações Gerais
