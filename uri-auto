@@ -23,7 +23,7 @@ import os
 import json
 import sys
 
-VERSION = "0.38"
+VERSION = "0.39"
 
 def remover_acentos(txt, codif='utf-8'):
 	return normalize('NFKD', txt.decode(codif)).encode('ASCII','ignore')
@@ -163,17 +163,18 @@ def main():
 	# else:
 	# 	sufix = linguagem.lower()
 	
-	if template["name"] == "default":
-		cabecalho = ""
-		template["sufix"] = linguagem.lower()
-	else:
-		cabecalho = template["cabecalho"] % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio)
 
 	if template["case-sensitive"]:
 		arquivo = "%s.%s" % (str.title(remover_acentos(exercicio)).replace(" ",""),template["sufix"])
 		exercicio = str.title(remover_acentos(exercicio)).replace(" ","")
 	else:
 		arquivo = "%s.%s" % ((str.lower(remover_acentos(exercicio))).replace(" ","-"),template["sufix"])
+
+	if template["name"] == "default":
+		cabecalho = ""
+		template["sufix"] = linguagem.lower()
+	else:
+		cabecalho = template["cabecalho"] % (data["nome"].encode("utf8"), data["matricula"].encode("utf8"), data["email"].encode("utf8"), exercicio)
 
 	## Gravação do último arquivo no uri-auto.json
 	data["lastfile"] = arquivo
@@ -218,7 +219,7 @@ for i in range(1,len(sys.argv)):
 		# 	compiler = "tst test"
 		filename = data["lastfile"].split(".")
 		if template["compiler"] == "":
-			print 'Nenhuma ação definida para o template "%s".' % template["name"].encode("utf8")
+			print 'Nenhuma ação definida para %s, usando o template "%s".' % (data["lastlang"].encode("utf8"),template["name"].encode("utf8"))
 			sys.exit()
 		elif conta_argumentos(template["compiler"]) == 2:
 			os.system(template["compiler"] % (filename[0],filename[0]))	
@@ -234,7 +235,7 @@ for i in range(1,len(sys.argv)):
 		os.chdir(data["lastdir"])
 		filename = data["lastfile"].split(".")
 		if template["exec"] == "":
-			print 'Nenhuma ação definida para o template "%s".' % template["name"].encode("utf8")
+			print 'Nenhuma ação definida para %s, usando o template "%s".' % (data["lastlang"].encode("utf8"),template["name"].encode("utf8"))
 			sys.exit()
 		else:
 			os.system(template["exec"] % filename[0])
